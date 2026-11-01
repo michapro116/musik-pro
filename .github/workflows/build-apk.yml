@@ -3,7 +3,7 @@ name: Compilar APK MiMusic Pro
 on:
   push:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Permite compilar con 1 clic desde la pestaña Actions en GitHub
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,13 +18,14 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
-        cache: 'gradle'
 
-    - name: Dar permisos de ejecución a gradlew
-      run: chmod +x gradlew
+    - name: Configurar Gradle 8.10.2 Oficial
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.10.2'
 
     - name: Compilar APK Debug con Gradle
-      run: ./gradlew assembleDebug --stacktrace
+      run: gradle :app:assembleDebug --stacktrace
 
     - name: Subir APK compilado como artefacto descargable
       uses: actions/upload-artifact@v4
