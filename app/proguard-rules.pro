@@ -1,0 +1,3 @@
+-keep class com.mimusic.pro.** { *; }
+-dontwarn androidx.media3.**
+-dontwarn com.google.api.client.**

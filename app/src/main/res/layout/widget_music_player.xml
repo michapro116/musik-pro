@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#14141A"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/widget_song_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MiMusic Pro"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/widget_artist_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_song_title"
+        android:text="Reproductor Offline"
+        android:textColor="#A1A1AA"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/widget_play_pause"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@android:drawable/ic_media_play"
+        android:contentDescription="Play/Pause" />
+</RelativeLayout>
