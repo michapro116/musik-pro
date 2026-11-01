@@ -1,0 +1,6 @@
+{
+  "name": "MiMusic Pro",
+  "description": "Reproductor musical profesional para Android y Web con ecualizador de 10 bandas Audio Pro, gestión de biblioteca local offline y código nativo Kotlin.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

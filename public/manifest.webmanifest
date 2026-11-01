@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "MiMusic Pro - Reproductor Musical Offline",
+  "short_name": "MiMusic Pro",
+  "description": "Reproductor musical profesional offline con ecualizador de 10 bandas y nube Google Drive.",
+  "theme_color": "#0a0a0d",
+  "background_color": "#0a0a0d",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
