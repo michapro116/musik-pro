@@ -87,4 +87,6 @@ dependencies {
     implementation(libs.play.services.auth)
     // Palette Dynamic Colors
     implementation(libs.androidx.palette)
+    // WebKit WebView Asset Loader for Hybrid SPA
+    implementation(libs.androidx.webkit)
 }

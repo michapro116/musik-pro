@@ -1,130 +1,159 @@
 package com.mimusic.pro
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.*
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.webkit.WebViewAssetLoader
 import com.mimusic.pro.playback.MusicService
-import com.mimusic.pro.ui.car.CarModeActivity
-import com.mimusic.pro.ui.components.ContinuousWaveformVisualizer
-import com.mimusic.pro.ui.components.HiResAudioBadge
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var webView: WebView
+    private var fileUploadCallback: ValueCallback<Array<Uri>>? = null
+
+    private val filePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val clipData = result.data?.clipData
+            val data = result.data?.data
+            if (clipData != null) {
+                val uris = Array(clipData.itemCount) { i -> clipData.getItemAt(i).uri }
+                fileUploadCallback?.onReceiveValue(uris)
+            } else if (data != null) {
+                fileUploadCallback?.onReceiveValue(arrayOf(data))
+            } else {
+                fileUploadCallback?.onReceiveValue(null)
+            }
+        } else {
+            fileUploadCallback?.onReceiveValue(null)
+        }
+        fileUploadCallback = null
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+        // Inicializar servicio de audio en segundo plano
         try {
             val serviceIntent = Intent(this, MusicService::class.java)
             startService(serviceIntent)
         } catch (_: Exception) {}
 
-        setContent {
-            MiMusicProApp(
-                onOpenCarMode = {
-                    startActivity(Intent(this, CarModeActivity::class.java))
-                }
+        webView = WebView(this).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
             )
+            setBackgroundColor(Color.parseColor("#0A0A0D"))
+            scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+        }
+
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            databaseEnabled = true
+            mediaPlaybackRequiresUserGesture = false
+            allowFileAccess = true
+            allowContentAccess = true
+            loadWithOverviewMode = true
+            useWideViewPort = true
+            cacheMode = WebSettings.LOAD_DEFAULT
+            userAgentString = userAgentString + " MiMusicProNativeApp/1.0"
+        }
+
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldInterceptRequest(
+                view: WebView,
+                request: WebResourceRequest
+            ): WebResourceResponse? {
+                return assetLoader.shouldInterceptRequest(request.url)
+            }
+
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val url = request.url.toString()
+                if (url.startsWith("https://appassets.androidplatform.net") ||
+                    url.startsWith("https://ais-dev-") ||
+                    url.startsWith("https://ais-pre-") ||
+                    url.contains("accounts.google.com")
+                ) {
+                    return false
+                }
+                return try {
+                    val intent = Intent(Intent.ACTION_VIEW, request.url)
+                    startActivity(intent)
+                    true
+                } catch (_: Exception) {
+                    false
+                }
+            }
+        }
+
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                mWebView: WebView,
+                filePathCallback: ValueCallback<Array<Uri>>,
+                fileChooserParams: FileChooserParams
+            ): Boolean {
+                fileUploadCallback?.onReceiveValue(null)
+                fileUploadCallback = filePathCallback
+
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "audio/*"
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }
+                filePickerLauncher.launch(Intent.createChooser(intent, "Seleccionar canciones"))
+                return true
+            }
+
+            override fun onPermissionRequest(request: PermissionRequest) {
+                request.grant(request.resources)
+            }
+        }
+
+        setContentView(webView)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (webView.canGoBack()) {
+                    webView.goBack()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
+
+        val hasLocalAssets = try {
+            assets.open("index.html").close()
+            true
+        } catch (_: Exception) {
+            false
+        }
+
+        if (hasLocalAssets) {
+            webView.loadUrl("https://appassets.androidplatform.net/assets/index.html")
+        } else {
+            webView.loadUrl("https://ais-dev-kjgi5aqtckfdpxxprpvlgr-64441565370.us-east1.run.app/")
         }
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MiMusicProApp(onOpenCarMode: () -> Unit) {
-    var isPlaying by remember { mutableStateOf(false) }
-
-    Scaffold(
-        containerColor = Color(0xFF0A0A0D),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "MiMusic PRO",
-                        fontWeight = FontWeight.Black,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0A0A0D)
-                ),
-                actions = {
-                    IconButton(onClick = onOpenCarMode) {
-                        Text("🚗", fontSize = 18.sp)
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(220.dp)
-                    .background(Color(0xFF14141A), RoundedCornerShape(24.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "🎵",
-                    fontSize = 64.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            HiResAudioBadge(isHiRes = true, bitrate = "96kHz / 24-bit")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "MiMusic Pro Player",
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp,
-                color = Color.White
-            )
-
-            Text(
-                text = "Reproductor Nativo Android & Google Drive",
-                fontSize = 13.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            ContinuousWaveformVisualizer(isPlaying = isPlaying)
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { isPlaying = !isPlaying },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF10B981)
-                ),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth(0.6f)
-            ) {
-                Text(
-                    text = if (isPlaying) "Pausar" else "Reproducir",
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+    override fun onDestroy() {
+        webView.destroy()
+        super.onDestroy()
     }
 }

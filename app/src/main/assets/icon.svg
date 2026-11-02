@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+  
+  <!-- App Background Squircle -->
+  <rect width="512" height="512" rx="128" fill="#0d0d12" />
+  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#bg)" />
+  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#glow)" />
+  
+  <!-- Headphones & Musical Note Crest -->
+  <!-- Outer Headphone Band -->
+  <path d="M140 256 C 140 160, 200 110, 256 110 C 312 110, 372 160, 372 256" 
+        fill="none" stroke="#000000" stroke-width="28" stroke-linecap="round" />
+  
+  <!-- Ear Cups -->
+  <rect x="120" y="240" width="40" height="90" rx="20" fill="#000000" />
+  <rect x="352" y="240" width="40" height="90" rx="20" fill="#000000" />
+  
+  <!-- Musical Double Note -->
+  <path d="M 230 330 
+           A 30 24 0 1 1 200 306 
+           L 200 180 
+           L 290 160 
+           L 290 290 
+           A 30 24 0 1 1 260 266 
+           L 260 200 
+           L 220 210 
+           L 220 330 Z" 
+        fill="#000000" />
+  <path d="M 200 180 L 290 160 L 290 180 L 200 200 Z" fill="#000000" />
+</svg>

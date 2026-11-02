@@ -18,8 +18,10 @@ googleApiDrive = "v3-rev20240901-2.0.0"
 mediaRouter = "1.7.0"
 castFramework = "21.5.0"
 palette = "1.0.0"
+webkit = "1.12.1"
 
 [libraries]
+androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
 androidx-palette = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
