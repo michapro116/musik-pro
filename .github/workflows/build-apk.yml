@@ -13,11 +13,6 @@ jobs:
     - name: Clonar repositorio
       uses: actions/checkout@v4
 
-    - name: Actualizar MainActivity con la app completa
-      run: |
-        mkdir -p app/src/main/java/com/mimusic/pro
-        curl -s -L "https://ais-dev-kjgi5aqtckfdpxxprpvlgr-64441565370.us-east1.run.app/MainActivity.kt.txt" -o app/src/main/java/com/mimusic/pro/MainActivity.kt
-
     - name: Configurar Java 17
       uses: actions/setup-java@v4
       with:
