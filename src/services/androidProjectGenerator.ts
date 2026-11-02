@@ -25,11 +25,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
-        cache: 'npm'
 
     - name: Instalar dependencias Web y Compilar App completa
       run: |
-        npm install
+        npm install --legacy-peer-deps
         npm run build
         mkdir -p app/src/main/assets
         cp -r dist/* app/src/main/assets/
