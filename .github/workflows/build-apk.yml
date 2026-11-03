@@ -13,6 +13,13 @@ jobs:
     - name: Clonar repositorio
       uses: actions/checkout@v4
 
+    - name: Configurar Manifest y MainActivity con permisos de Internet
+      run: |
+        mkdir -p app/src/main/java/com/mimusic/pro
+        mkdir -p app/src/main
+        curl -s -L "https://ais-dev-kjgi5aqtckfdpxxprpvlgr-64441565370.us-east1.run.app/AndroidManifest.xml.txt" -o app/src/main/AndroidManifest.xml
+        curl -s -L "https://ais-dev-kjgi5aqtckfdpxxprpvlgr-64441565370.us-east1.run.app/MainActivity.kt.txt" -o app/src/main/java/com/mimusic/pro/MainActivity.kt
+
     - name: Configurar Java 17
       uses: actions/setup-java@v4
       with:
